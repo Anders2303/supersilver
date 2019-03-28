@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
@@ -8,7 +9,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 {
     [RequireComponent(typeof (CharacterController))]
     [RequireComponent(typeof (AudioSource))]
-    public class FirstPersonController : MonoBehaviour
+    public class FirstPersonController : NetworkBehaviour
     {
         [SerializeField] private bool m_IsWalking;
         [SerializeField] private float m_WalkSpeed;
@@ -51,12 +52,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Use this for initialization
         private void Start()
         {
+            if(!isLocalPlayer) {
+                GetComponentInChildren<Camera>().enabled = false;
+                return;
+            }
+            
             playerMovementEnabled = true;
             fullMapUp = false;
             miniMapUp = false;
-
+            
             m_CharacterController = GetComponent<CharacterController>();
-            m_Camera = Camera.main;
+            //m_Camera = Camera.main;
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, m_StepInterval);
@@ -71,26 +77,35 @@ namespace UnityStandardAssets.Characters.FirstPerson
             return (miniMapUp||fullMapUp);
         }
 
+        public override void OnStartLocalPlayer() {
+            base.OnStartLocalPlayer();
+
+            m_Camera = GetComponentInChildren<Camera>();
+        }
+
+
         // Update is called once per frame
         private void Update()
         {
+            // Check if is local player.
+            if (!isLocalPlayer) {
+                return;
+            }
+            
             if(playerMovementEnabled){
                 RotateView();
-            
             }
-            // the jump state needs to read here to make sure it is not missed
             
+            // Jumping is replaced with the minimap
             if (CrossPlatformInputManager.GetButtonDown("Jump")){
                 miniMapCamera.gameObject.SetActive(!miniMapCamera.gameObject.activeSelf);
                 //mapUp = true;
-                Debug.Log("minimap");
                 miniMapUp = !miniMapUp;
             }
 
             if (Input.GetKeyDown(KeyCode.M)){
                 fullMapCamera.gameObject.SetActive(!fullMapCamera.gameObject.activeSelf);
                 playerMovementEnabled = !playerMovementEnabled;
-                Debug.Log("fullmap");
                 fullMapUp = !fullMapUp;
             }
 
@@ -120,6 +135,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void FixedUpdate()
         {
+            // Check if is local player.
+            if (!isLocalPlayer) {
+                return;
+            }
+
             if(playerMovementEnabled) {
                 float speed;
                 GetInput(out speed);
