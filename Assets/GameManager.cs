@@ -7,6 +7,13 @@ public class GameManager : MonoBehaviour
     
     public static GameManager instance = null;
 
+    public GameObject playerPrefab;
+    
+    public Vector3 spawnIncrements;
+    public Vector3 spawnOffsets;
+    public Vector3 spawnMinLimits;
+    public Vector3 spawnMaxLimits;
+
     //private 
     
 
@@ -26,10 +33,23 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    public void SpawnPlayer(GameObject playerObject) {
+        float spawnX = 0 + spawnOffsets.x;
+        float spawnY = 0 + spawnOffsets.y;
+        float spawnZ = 0 + spawnOffsets.z;
+
+        Vector3 randomPosition = new Vector3(spawnX, spawnY, spawnZ);
+        Instantiate(playerObject, randomPosition, Quaternion.identity);
+    }
+
+    public void SpawnPlayer(GameObject playerObject, Vector3 position) {
+        
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-
+        SpawnPlayer(playerPrefab);
     }
 
     
