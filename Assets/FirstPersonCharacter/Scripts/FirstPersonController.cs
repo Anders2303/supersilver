@@ -28,8 +28,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private AudioClip[] m_FootstepSounds;    // an array of footstep sounds that will be randomly selected from.
         [SerializeField] private AudioClip m_JumpSound;           // the sound played when character leaves the ground.
         [SerializeField] private AudioClip m_LandSound;           // the sound played when character touches back on ground.
-        [SerializeField] private Camera fullMapCamera;
         [SerializeField] private Camera miniMapCamera;
+        private Camera fullMapCamera;
 
         private bool playerMovementEnabled;
         private bool fullMapUp;
@@ -49,20 +49,26 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Jumping;
         private AudioSource m_AudioSource;
 
-        // Use this for initialization
+        //private bool notYetSpawned = false;
+
         private void Start()
         {
-            if(!isLocalPlayer) {
+            if(!hasAuthority){
                 GetComponentInChildren<Camera>().enabled = false;
-                return;
+                GetComponentInChildren<AudioListener>().enabled = false;
             }
-            
+        }
+        
+        // Use this for initialization
+        private void Late_Start()
+        {
+
             playerMovementEnabled = true;
             fullMapUp = false;
             miniMapUp = false;
             
             m_CharacterController = GetComponent<CharacterController>();
-            //m_Camera = Camera.main;
+            m_Camera = GetComponentInChildren<Camera>();
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, m_StepInterval);
@@ -71,16 +77,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_Jumping = false;
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
+            fullMapCamera = GameManager.instance.getFullmapCamera();
+            
+            //GameManager.instance.MovePlayerToRandomPosition(this.gameObject);
+            
         }
 
         public bool IsMapUp(){
             return (miniMapUp||fullMapUp);
         }
 
-        public override void OnStartLocalPlayer() {
-            base.OnStartLocalPlayer();
-
+        public override void OnStartAuthority() {
+            base.OnStartAuthority();
+        
+            Debug.Log("here1");
             m_Camera = GetComponentInChildren<Camera>();
+            m_Camera.enabled = true;
+            Late_Start();
         }
 
 
@@ -88,10 +101,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void Update()
         {
             // Check if is local player.
-            if (!isLocalPlayer) {
+            if (!hasAuthority) {
                 return;
             }
-            
+
             if(playerMovementEnabled){
                 RotateView();
             }
@@ -136,7 +149,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void FixedUpdate()
         {
             // Check if is local player.
-            if (!isLocalPlayer) {
+            if (!hasAuthority) {
                 return;
             }
 

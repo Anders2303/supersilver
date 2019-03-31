@@ -6,16 +6,22 @@ public class GameManager : MonoBehaviour
 {    
     
     public static GameManager instance = null;
-
-    public GameObject playerPrefab;
     
     public Vector3 spawnIncrements;
     public Vector3 spawnOffsets;
     public Vector3 spawnMinLimits;
     public Vector3 spawnMaxLimits;
 
-    //private 
-    
+    public Camera fullMapCamera;
+    public GameObject spawnpoint;
+
+    public Light[] mapLights;
+    public Light[] firstPersonLights;
+
+
+    public Camera getFullmapCamera(){
+        return fullMapCamera;
+    }
 
     void Awake()
     {
@@ -31,25 +37,45 @@ public class GameManager : MonoBehaviour
         }
         //Sets this to not be destroyed when reloading scene
         DontDestroyOnLoad(gameObject);
+        //MovePlayerToRandomPosition();
+    }
+    public Vector3 GetRandomPlayerPosition() {
+        int increments  = Random.Range(-3, 3); 
+        float spawnX = spawnIncrements.x*increments + spawnOffsets.x;
+        increments  = Random.Range(-3, 3); 
+        float spawnY = spawnIncrements.y*increments + spawnOffsets.y;
+        increments  = Random.Range(-3, 3); 
+        float spawnZ = spawnIncrements.z*increments + spawnOffsets.z;
+
+        return new Vector3(spawnX, spawnY, spawnZ);
     }
 
-    public void SpawnPlayer(GameObject playerObject) {
-        float spawnX = 0 + spawnOffsets.x;
-        float spawnY = 0 + spawnOffsets.y;
-        float spawnZ = 0 + spawnOffsets.z;
+    public void MovePlayerToRandomPosition(GameObject playerObject) {
+        Debug.Log("moving");
+        
+        int increments  = Random.Range(-3, 3); 
+        float spawnX = spawnIncrements.x*increments + spawnOffsets.x;
+        increments  = Random.Range(-3, 3); 
+        float spawnY = spawnIncrements.y*increments + spawnOffsets.y;
+        increments  = Random.Range(-3, 3); 
+        float spawnZ = spawnIncrements.z*increments + spawnOffsets.z;
 
         Vector3 randomPosition = new Vector3(spawnX, spawnY, spawnZ);
-        Instantiate(playerObject, randomPosition, Quaternion.identity);
+        playerObject.transform.position = randomPosition;
+        //Instantiate(spawnpoint, randomPosition, Quaternion.identity);
     }
 
-    public void SpawnPlayer(GameObject playerObject, Vector3 position) {
-        
+    public void GiveRandomColor(GameObject playerObject) {
+        foreach (Renderer rend in playerObject.GetComponentsInChildren<Renderer>())
+        {
+            rend.material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+        }
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        SpawnPlayer(playerPrefab);
+        //SpawnPlayer(playerPrefab);
     }
 
     
