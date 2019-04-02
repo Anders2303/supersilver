@@ -358,9 +358,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
         private void OnTriggerEnter(Collider collider) {
+            
+            if(!hasAuthority) {
+                return;
+            }
+
             if(collider.gameObject.tag == "BadPlayer") {
+                Debug.Log("I WAS HIT!");
                 inPrison = true;
-                transform.position = new Vector3(0.0f, 0.1f, 0.0f);
+                m_CharacterController.enabled = false;
+                transform.position = new Vector3(0.0f, 1.0f, 0.0f);
+                m_CharacterController.enabled = true;
+
             }
         }
     }
