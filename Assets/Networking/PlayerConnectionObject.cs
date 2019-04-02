@@ -24,15 +24,6 @@ public class PlayerConnectionObject : NetworkBehaviour
     [SyncVar]
     public GameObject myController;
 
-    // public void UpdateColor(){
-    //     Debug.Log("updating playerColor");
-    // }
-    
-    // public override void OnStartClient()
-    // {
-    //     UpdateColor();
-    // }
-
     
     // Start is called before the first frame update
     void Start()
@@ -54,8 +45,10 @@ public class PlayerConnectionObject : NetworkBehaviour
         if(isServer) {
             playerColor = playerColor_badguy;
             isBadGuy = true;
+            GameManager.instance.SetGameStatusText("Press the \"O\" key to start game");
             Cmd_SpawnPlayerController_badguy();
         } else {
+            GameManager.instance.SetGameStatusText("Waiting for host to start game");
             Cmd_SpawnPlayerController();
         }
         
@@ -64,7 +57,9 @@ public class PlayerConnectionObject : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (isServer && !GameManager.instance.gameTimerOn && Input.GetKeyDown(KeyCode.O)) {
+            Cmd_StartGame();
+        } 
     }
     
     //public override void OnStartClient()
@@ -93,9 +88,16 @@ public class PlayerConnectionObject : NetworkBehaviour
     }
 
     [Command]
+    void Cmd_StartGame()
+    {
+        GameManager.instance.StartGame();
+        Rpc_StartGame();
+    }
+
+    [Command]
     void Cmd_SpawnPlayerController_badguy() {
         GameObject player = Instantiate(playerControllerPrefab_badguy, GameManager.instance.GetRandomPlayerPosition_badguy(), Quaternion.identity);
-
+        player.transform.LookAt(Vector3.zero);
         //GameManager.instance.GiveRandomColor(player);
         //player.GetComponent<FirstPersonController>().SetOwner(this);
         Debug.Log("Updating server");
@@ -110,7 +112,13 @@ public class PlayerConnectionObject : NetworkBehaviour
         Rpc_setOwner(player);
     }
 
-    //Client RCP
+    //Client RPC
+    [ClientRpc]
+    void Rpc_StartGame()
+    {
+        GameManager.instance.StartGame();
+    }
+
     [ClientRpc]
     void Rpc_setOwner(GameObject playerObject) {
         myController = playerObject;

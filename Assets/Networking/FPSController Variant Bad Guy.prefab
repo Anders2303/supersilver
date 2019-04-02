@@ -271,6 +271,9 @@ MonoBehaviour:
   m_LandSound: {fileID: 8300000, guid: 3b09d59f4499d45428baa7a21e954296, type: 3}
   miniMapCamera: {fileID: 6788981850507127392}
   pointerRenderer: {fileID: 6788981850507127394}
+  mapCullingMask:
+    serializedVersion: 2
+    m_Bits: 3383
   fullMapUp: 0
   miniMapUp: 0
   localOwner: {fileID: 0}

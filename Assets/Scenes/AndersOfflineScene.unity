@@ -220,7 +220,7 @@ MonoBehaviour:
   manager: {fileID: 0}
   showGUI: 1
   offsetX: 0
-  offsetY: 220
+  offsetY: 0
 --- !u!114 &9331314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -251,6 +251,7 @@ MonoBehaviour:
   m_SpawnPrefabs:
   - {fileID: 6640240593151843297, guid: 66bd20dadbf5fda49bf197776eb2fb4a, type: 3}
   - {fileID: 7447296831780299763, guid: 5a8a718bf1f335b349ade623eef1f7d8, type: 3}
+  - {fileID: 6788981850507127412, guid: ee795f1ee50ace2f4896fcbed5abb599, type: 3}
   m_CustomConfig: 0
   m_MaxConnections: 4
   m_ConnectionConfig:
