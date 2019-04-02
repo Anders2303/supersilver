@@ -6,7 +6,8 @@ public class GameManager : MonoBehaviour
 {    
     
     public static GameManager instance = null;
-    
+    public bool dontDestroyOnLoad;
+
     public Vector3 spawnIncrements;
     public Vector3 spawnOffsets;
     public Vector3 spawnMinLimits;
@@ -23,6 +24,11 @@ public class GameManager : MonoBehaviour
         return fullMapCamera;
     }
 
+    public int RandomSign() {
+        return Random.value < .5? 1 : -1;
+    }
+
+
     void Awake()
     {
         //Check if instance already exists
@@ -35,41 +41,54 @@ public class GameManager : MonoBehaviour
             //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
             Destroy(gameObject);    
         }
-        //Sets this to not be destroyed when reloading scene
-        DontDestroyOnLoad(gameObject);
-        //MovePlayerToRandomPosition();
+        if (dontDestroyOnLoad) {
+            //Sets this to not be destroyed when reloading scene
+            DontDestroyOnLoad(gameObject);
+            //MovePlayerToRandomPosition();
+        }
+    
     }
-    public Vector3 GetRandomPlayerPosition() {
-        int increments  = Random.Range(-3, 3); 
+    public Vector3 GetRandomPlayerPosition() 
+    {
+        int increments  = Random.Range(-4, 4); 
         float spawnX = spawnIncrements.x*increments + spawnOffsets.x;
-        increments  = Random.Range(-3, 3); 
+        increments  = Random.Range(-4, 4); 
         float spawnY = spawnIncrements.y*increments + spawnOffsets.y;
-        increments  = Random.Range(-3, 3); 
+        increments  = Random.Range(-4, 4); 
         float spawnZ = spawnIncrements.z*increments + spawnOffsets.z;
 
         return new Vector3(spawnX, spawnY, spawnZ);
     }
 
-    public void MovePlayerToRandomPosition(GameObject playerObject) {
-        Debug.Log("moving");
+    public Vector3 GetRandomPlayerPosition_badguy() 
+    {
+        float spawnX = RandomSign()*spawnMaxLimits.x;
         
-        int increments  = Random.Range(-3, 3); 
-        float spawnX = spawnIncrements.x*increments + spawnOffsets.x;
-        increments  = Random.Range(-3, 3); 
-        float spawnY = spawnIncrements.y*increments + spawnOffsets.y;
-        increments  = Random.Range(-3, 3); 
-        float spawnZ = spawnIncrements.z*increments + spawnOffsets.z;
+        float spawnY = 1;
+        
+        float spawnZ = RandomSign()*spawnMaxLimits.x;
 
-        Vector3 randomPosition = new Vector3(spawnX, spawnY, spawnZ);
-        playerObject.transform.position = randomPosition;
-        //Instantiate(spawnpoint, randomPosition, Quaternion.identity);
+        return new Vector3(spawnX, spawnY, spawnZ);
     }
 
-    public void GiveRandomColor(GameObject playerObject) {
-        foreach (Renderer rend in playerObject.GetComponentsInChildren<Renderer>())
-        {
-            rend.material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-        }
+    // public void MovePlayerToRandomPosition(GameObject playerObject) {
+    //     Debug.Log("moving");
+        
+    //     int increments  = Random.Range(-3, 3); 
+    //     float spawnX = spawnIncrements.x*increments + spawnOffsets.x;
+    //     increments  = Random.Range(-3, 3); 
+    //     float spawnY = spawnIncrements.y*increments + spawnOffsets.y;
+    //     increments  = Random.Range(-3, 3); 
+    //     float spawnZ = spawnIncrements.z*increments + spawnOffsets.z;
+
+    //     Vector3 randomPosition = new Vector3(spawnX, spawnY, spawnZ);
+    //     playerObject.transform.position = randomPosition;
+    //     //Instantiate(spawnpoint, randomPosition, Quaternion.identity);
+    // }
+
+    public Color GetRandomPlayerColor() {
+        return Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+        
     }
 
     // Start is called before the first frame update

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityStandardAssets.Characters.FirstPerson;
+using UnityEngine.Networking;
 
-public class HeatmapTracker : MonoBehaviour
+public class HeatmapTracker : NetworkBehaviour
 {
     public float positionTrackingFrequency; // How often to store location
     public GameObject heatmapTrail;
@@ -36,16 +37,25 @@ public class HeatmapTracker : MonoBehaviour
                 Vector3 newPos = transform.position;
                 newPos.y = 194.6f;
 
-                if(lastPos == newPos) {
-                    Destroy(lastObject);
-                }
+                //if(lastPos == newPos) {
+                //    Destroy(lastObject);
+                //}
 
-                lastObject = Instantiate(heatmapTrail, newPos, Quaternion.identity);
+                Cmd_SpawnHeatMapObject(newPos);
+                
                 trackingTimer = 0;
                 lastPos = newPos;
             }
         } else {
             trackingTimer = positionTrackingFrequency;
         }
+    }
+
+    [Command]
+    public void Cmd_SpawnHeatMapObject(Vector3 newPos) {
+        GameObject go = Instantiate(heatmapTrail, newPos, Quaternion.identity);
+            
+        //player.GetComponent<FirstPersonController>().ForceLocalComponents();
+        NetworkServer.Spawn(go);
     }
 }
