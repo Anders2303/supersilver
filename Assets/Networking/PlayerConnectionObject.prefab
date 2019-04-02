@@ -77,5 +77,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b53969aade6e8104db6e59ec4a9bebca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerColor: {r: 0, g: 0, b: 0, a: 0}
+  playerColor_badguy: {r: 0, g: 0, b: 0, a: 0}
   playerControllerPrefab: {fileID: 6640240593151843297, guid: 66bd20dadbf5fda49bf197776eb2fb4a,
     type: 3}
+  playerControllerPrefab_badguy: {fileID: 6788981850507127412, guid: ee795f1ee50ace2f4896fcbed5abb599,
+    type: 3}
+  isBadGuy: 0
+  myController: {fileID: 0}

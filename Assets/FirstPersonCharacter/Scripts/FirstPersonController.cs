@@ -29,11 +29,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private AudioClip m_JumpSound;           // the sound played when character leaves the ground.
         [SerializeField] private AudioClip m_LandSound;           // the sound played when character touches back on ground.
         [SerializeField] private Camera miniMapCamera;
+        [SerializeField] private Renderer pointerRenderer;
+
+        
+
         private Camera fullMapCamera;
 
         private bool playerMovementEnabled;
-        private bool fullMapUp;
-        private bool miniMapUp;
+        [SyncVar] public bool fullMapUp;
+        [SyncVar] public bool miniMapUp;
         private bool inPrison;
 
         private Camera m_Camera;
@@ -52,6 +56,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private float prisonTimer;
 
+        
+        public PlayerConnectionObject localOwner;
+
+        public void SetOwner(PlayerConnectionObject owner) {
+            Debug.Log("Setting owner");
+            localOwner = owner;
+        }
+
+        public PlayerConnectionObject GetOwner() {
+            return localOwner;
+        }
         //private bool notYetSpawned = false;
 
         private void Start()
@@ -61,11 +76,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 GetComponentInChildren<AudioListener>().enabled = false;
             }
         }
+
+        [Command]
+        void Cmd_updateMiniMapState(bool state) {
+            miniMapUp = state;
+        } 
         
+        [Command]
+        void Cmd_updateFullMapState(bool state) {
+            fullMapUp = state;
+        } 
+
         // Use this for initialization
         private void Late_Start()
         {
-
+            Debug.Log("here");
             playerMovementEnabled = true;
             fullMapUp = false;
             miniMapUp = false;
@@ -96,7 +121,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public override void OnStartAuthority() {
             base.OnStartAuthority();
         
-            Debug.Log("here1");
             m_Camera = GetComponentInChildren<Camera>();
             m_Camera.enabled = true;
             Late_Start();
@@ -106,6 +130,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
+            if (!IsMapUp() && pointerRenderer.enabled) {
+                pointerRenderer.enabled = false;
+            }
+
+            else if (IsMapUp() && !pointerRenderer.enabled) {
+                pointerRenderer.enabled = true;
+            }
+
             // Check if is local player.
             if (!hasAuthority) {
                 return;
@@ -120,14 +152,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 miniMapCamera.gameObject.SetActive(!miniMapCamera.gameObject.activeSelf);
                 //mapUp = true;
                 miniMapUp = !miniMapUp;
+                Cmd_updateMiniMapState(miniMapUp);
+
             }
 
             if (Input.GetKeyDown(KeyCode.M)){
                 fullMapCamera.gameObject.SetActive(!fullMapCamera.gameObject.activeSelf);
                 playerMovementEnabled = !playerMovementEnabled;
                 fullMapUp = !fullMapUp;
+                Cmd_updateFullMapState(fullMapUp);
             }
-
             // if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
             // {
             //     StartCoroutine(m_JumpBob.DoBobCycle());
