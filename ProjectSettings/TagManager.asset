@@ -15,10 +15,10 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - MapOnly
-  - NoMap
-  - 
-  - 
+  - Not visible in Map
+  - Only Visible in Map
+  - "Hidden From Good guy Map\x13"
+  - Hidden from Bad guy Map
   - 
   - 
   - 

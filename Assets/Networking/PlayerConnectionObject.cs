@@ -53,7 +53,7 @@ public class PlayerConnectionObject : NetworkBehaviour
         // Spawn player controller
         if(isServer) {
             playerColor = playerColor_badguy;
-
+            isBadGuy = true;
             Cmd_SpawnPlayerController_badguy();
         } else {
             Cmd_SpawnPlayerController();
