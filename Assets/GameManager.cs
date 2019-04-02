@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {    
@@ -19,6 +20,13 @@ public class GameManager : MonoBehaviour
     public Light[] mapLights;
     public Light[] firstPersonLights;
 
+    public bool gameTimerOn = false;
+
+    public GameObject gameStatusText;
+    
+    public float gameTime;
+
+    
 
     public Camera getFullmapCamera(){
         return fullMapCamera;
@@ -46,8 +54,12 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             //MovePlayerToRandomPosition();
         }
-    
     }
+    public void SetGameStatusText(string newText) {
+        gameStatusText.GetComponent<UnityEngine.UI.Text>().text = newText;
+    }
+
+
     public Vector3 GetRandomPlayerPosition() 
     {
         int increments  = Random.Range(-4, 4); 
@@ -62,10 +74,8 @@ public class GameManager : MonoBehaviour
 
     public Vector3 GetRandomPlayerPosition_badguy() 
     {
-        float spawnX = RandomSign()*spawnMaxLimits.x;
-        
+        float spawnX = RandomSign()*spawnMaxLimits.x;  
         float spawnY = 1;
-        
         float spawnZ = RandomSign()*spawnMaxLimits.x;
 
         return new Vector3(spawnX, spawnY, spawnZ);
@@ -91,6 +101,10 @@ public class GameManager : MonoBehaviour
         
     }
 
+    public void StartGame() {
+        gameTimerOn = true;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -102,6 +116,14 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // y
+        if(gameTimerOn) {
+            gameTime -= Time.deltaTime;
+            
+            int minutes = Mathf.FloorToInt(gameTime / 60F);
+            int seconds = Mathf.FloorToInt(gameTime - minutes * 60);
+            string niceTime = string.Format("{0:0}:{1:00}", minutes, seconds);
+
+            gameStatusText.GetComponent<UnityEngine.UI.Text>().text = "Time remaining: " + niceTime;
+        }
     }
 }

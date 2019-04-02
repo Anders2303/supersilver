@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7447296831780299757}
   - component: {fileID: 7447296831780299762}
   - component: {fileID: 3245914496759265376}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Heatmap Trail Piece
   m_TagString: Untagged
   m_Icon: {fileID: 0}

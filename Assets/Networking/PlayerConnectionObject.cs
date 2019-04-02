@@ -24,15 +24,11 @@ public class PlayerConnectionObject : NetworkBehaviour
     [SyncVar]
     public GameObject myController;
 
-    // public void UpdateColor(){
-    //     Debug.Log("updating playerColor");
-    // }
-    
-    // public override void OnStartClient()
-    // {
-    //     UpdateColor();
-    // }
-
+    private bool gameHasEnded = false;
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
     
     // Start is called before the first frame update
     void Start()
@@ -53,18 +49,40 @@ public class PlayerConnectionObject : NetworkBehaviour
         // Spawn player controller
         if(isServer) {
             playerColor = playerColor_badguy;
-
+            isBadGuy = true;
+            GameManager.instance.SetGameStatusText("Press the \"O\" key to start game");
             Cmd_SpawnPlayerController_badguy();
         } else {
+            GameManager.instance.SetGameStatusText("Waiting for host to start game");
             Cmd_SpawnPlayerController();
         }
         
     }
 
+    void Disconnect() {
+        if(isServer){
+            NetworkManager.singleton.StopHost();
+        }
+        NetworkManager.singleton.StopClient();
+    }
     // Update is called once per frame
     void Update()
     {
         
+        if(!isLocalPlayer) {
+            return;
+        }
+        if (isServer && !GameManager.instance.gameTimerOn && Input.GetKeyDown(KeyCode.O)) {
+            Cmd_StartGame();
+        }
+
+        if(!gameHasEnded && GameManager.instance.gameTime <= 0) {
+            Debug.Log("Time ran out");
+            gameHasEnded = true;
+            if(isServer) {
+                Cmd_EndGame("The Agent");
+            }
+        }
     }
     
     //public override void OnStartClient()
@@ -74,6 +92,21 @@ public class PlayerConnectionObject : NetworkBehaviour
     //}
 
     //- SERVER COMMANDS -----------------------------------
+    [Command]
+    void Cmd_EndGame(string winningTeam) 
+    {
+        Debug.Log("Changing scene");
+        DataManager.instance.winningTeam = winningTeam;          
+        Rpc_SetWinningTeam(winningTeam);      
+        NetworkManager.singleton.ServerChangeScene("Endscreen");
+    }
+
+    [ClientRpc]
+    void Rpc_SetWinningTeam(string winner)
+    {
+        DataManager.instance.winningTeam = winner;
+    }
+
     [Command]
     void Cmd_SpawnPlayerController() {
         GameObject player = Instantiate(playerControllerPrefab, GameManager.instance.GetRandomPlayerPosition(), Quaternion.identity);
@@ -93,9 +126,16 @@ public class PlayerConnectionObject : NetworkBehaviour
     }
 
     [Command]
+    void Cmd_StartGame()
+    {
+        GameManager.instance.StartGame();
+        Rpc_StartGame();
+    }
+
+    [Command]
     void Cmd_SpawnPlayerController_badguy() {
         GameObject player = Instantiate(playerControllerPrefab_badguy, GameManager.instance.GetRandomPlayerPosition_badguy(), Quaternion.identity);
-
+        player.transform.LookAt(Vector3.zero);
         //GameManager.instance.GiveRandomColor(player);
         //player.GetComponent<FirstPersonController>().SetOwner(this);
         Debug.Log("Updating server");
@@ -110,7 +150,18 @@ public class PlayerConnectionObject : NetworkBehaviour
         Rpc_setOwner(player);
     }
 
-    //Client RCP
+    // [ClientRpc]
+    // void Rpc_setWinningTeam(string team)
+    // {
+    //     DataManager.instance
+    // }
+    //Client RPC
+    [ClientRpc]
+    void Rpc_StartGame()
+    {
+        GameManager.instance.StartGame();
+    }
+
     [ClientRpc]
     void Rpc_setOwner(GameObject playerObject) {
         myController = playerObject;

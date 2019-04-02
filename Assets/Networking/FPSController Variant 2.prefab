@@ -64,7 +64,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 311
+    m_Bits: 823
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -273,6 +273,9 @@ MonoBehaviour:
   m_LandSound: {fileID: 8300000, guid: 3b09d59f4499d45428baa7a21e954296, type: 3}
   miniMapCamera: {fileID: 6640240593151843304}
   pointerRenderer: {fileID: 6640240593151843318}
+  mapCullingMask:
+    serializedVersion: 2
+    m_Bits: 5431
   fullMapUp: 0
   miniMapUp: 0
   localOwner: {fileID: 0}
@@ -502,7 +505,7 @@ GameObject:
   - component: {fileID: 6640240593151843314}
   - component: {fileID: 6640240593151843319}
   - component: {fileID: 6640240593151843324}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -593,7 +596,7 @@ GameObject:
   - component: {fileID: 6640240593151843310}
   - component: {fileID: 6640240593151843317}
   - component: {fileID: 6640240593151843318}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: Direction pointer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -721,7 +724,7 @@ Camera:
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 5431
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

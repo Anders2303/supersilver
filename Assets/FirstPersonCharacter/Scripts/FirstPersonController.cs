@@ -30,8 +30,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private AudioClip m_LandSound;           // the sound played when character touches back on ground.
         [SerializeField] private Camera miniMapCamera;
         [SerializeField] private Renderer pointerRenderer;
-
         
+        
+        public LayerMask mapCullingMask;
 
         private Camera fullMapCamera;
 
@@ -53,20 +54,19 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_NextStep;
         private bool m_Jumping;
         private AudioSource m_AudioSource;
-
+        
         private float prisonTimer;
 
-        
         public PlayerConnectionObject localOwner;
 
-        public void SetOwner(PlayerConnectionObject owner) {
-            Debug.Log("Setting owner");
-            localOwner = owner;
-        }
+        // public void SetOwner(PlayerConnectionObject owner) {
+        //     Debug.Log("Setting owner");
+        //     localOwner = owner;
+        // }
 
-        public PlayerConnectionObject GetOwner() {
-            return localOwner;
-        }
+        // public PlayerConnectionObject GetOwner() {
+        //     return localOwner;
+        // }
         //private bool notYetSpawned = false;
 
         private void Start()
@@ -106,6 +106,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
             fullMapCamera = GameManager.instance.getFullmapCamera();
+            fullMapCamera.cullingMask = mapCullingMask;
+            miniMapCamera.cullingMask = mapCullingMask;
 
             inPrison = false;
             prisonTimer = 7.0f;
@@ -143,6 +145,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 return;
             }
 
+            if(!GameManager.instance.gameTimerOn) {
+                return;
+            }
+            
+
             if(playerMovementEnabled){
                 RotateView();
             }
@@ -162,6 +169,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 fullMapUp = !fullMapUp;
                 Cmd_updateFullMapState(fullMapUp);
             }
+
             // if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
             // {
             //     StartCoroutine(m_JumpBob.DoBobCycle());

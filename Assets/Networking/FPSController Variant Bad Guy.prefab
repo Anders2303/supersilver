@@ -64,7 +64,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 311
+    m_Bits: 823
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -115,7 +115,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6788981850507127419}
   - component: {fileID: 6788981850507127313}
-  - component: {fileID: 6788981850507127317}
   - component: {fileID: 6788981850507127405}
   - component: {fileID: 6788981850507127400}
   - component: {fileID: 6788981850507127402}
@@ -272,25 +271,12 @@ MonoBehaviour:
   m_LandSound: {fileID: 8300000, guid: 3b09d59f4499d45428baa7a21e954296, type: 3}
   miniMapCamera: {fileID: 6788981850507127392}
   pointerRenderer: {fileID: 6788981850507127394}
+  mapCullingMask:
+    serializedVersion: 2
+    m_Bits: 3383
   fullMapUp: 0
   miniMapUp: 0
   localOwner: {fileID: 0}
---- !u!114 &6788981850507127317
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6788981850507127412}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83ed8703a46cb7e2bae48123b8502bc0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  positionTrackingFrequency: 0.7
-  heatmapTrail: {fileID: 7447296831780299763, guid: 5a8a718bf1f335b349ade623eef1f7d8,
-    type: 3}
-  trailSpawnHeight: 0
 --- !u!143 &6788981850507127405
 CharacterController:
   m_ObjectHideFlags: 0
@@ -488,7 +474,7 @@ GameObject:
   - component: {fileID: 6788981850507127397}
   - component: {fileID: 6788981850507127395}
   - component: {fileID: 6788981850507127404}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -579,7 +565,7 @@ GameObject:
   - component: {fileID: 6788981850507127421}
   - component: {fileID: 6788981850507127398}
   - component: {fileID: 6788981850507127394}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: Direction pointer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -707,7 +693,7 @@ Camera:
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 3383
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
