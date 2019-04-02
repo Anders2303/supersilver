@@ -3896,7 +3896,7 @@ MonoBehaviour:
   - {fileID: 1705831844}
   gameTimerOn: 0
   gameStatusText: {fileID: 1412963334}
-  gameTime: 50
+  gameTime: 5
 --- !u!1001 &830014630
 PrefabInstance:
   m_ObjectHideFlags: 0

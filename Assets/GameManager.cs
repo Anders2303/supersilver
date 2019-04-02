@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviour
     
     public float gameTime;
 
+    
+
     public Camera getFullmapCamera(){
         return fullMapCamera;
     }
