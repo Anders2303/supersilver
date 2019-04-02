@@ -34,6 +34,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool playerMovementEnabled;
         private bool fullMapUp;
         private bool miniMapUp;
+        private bool inPrison;
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -48,6 +49,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_NextStep;
         private bool m_Jumping;
         private AudioSource m_AudioSource;
+
+        private float prisonTimer;
 
         //private bool notYetSpawned = false;
 
@@ -78,6 +81,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
             fullMapCamera = GameManager.instance.getFullmapCamera();
+
+            inPrison = false;
+            prisonTimer = 7.0f;
             
             //GameManager.instance.MovePlayerToRandomPosition(this.gameObject);
             
@@ -315,6 +321,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 return;
             }
             body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
+        }
+
+        private void OnTriggerEnter(Collider collider) {
+            if(collider.gameObject.tag == "BadPlayer") {
+                inPrison = true;
+                transform.position = new Vector3(0.0f, 0.1f, 0.0f);
+            }
         }
     }
 }
