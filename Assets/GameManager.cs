@@ -119,7 +119,11 @@ public class GameManager : MonoBehaviour
         if(gameTimerOn) {
             gameTime -= Time.deltaTime;
             
-            gameStatusText.GetComponent<UnityEngine.UI.Text>().text = "Time remaining: " + (int)gameTime;
+            int minutes = Mathf.FloorToInt(gameTime / 60F);
+            int seconds = Mathf.FloorToInt(gameTime - minutes * 60);
+            string niceTime = string.Format("{0:0}:{1:00}", minutes, seconds);
+
+            gameStatusText.GetComponent<UnityEngine.UI.Text>().text = "Time remaining: " + niceTime;
         }
     }
 }
