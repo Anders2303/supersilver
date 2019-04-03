@@ -56,6 +56,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private AudioSource m_AudioSource;
         
         private float prisonTimer;
+        private float prisonTimerDefault;
 
         public PlayerConnectionObject localOwner;
 
@@ -110,7 +111,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             miniMapCamera.cullingMask = mapCullingMask;
 
             inPrison = false;
-            prisonTimer = 7.0f;
+            prisonTimer = prisonTimerDefault = 15.0f;
             
             //GameManager.instance.MovePlayerToRandomPosition(this.gameObject);
             
@@ -141,14 +142,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
             // Check if is local player.
-            if (!hasAuthority) {
-                return;
-            }
-
-            if(!GameManager.instance.gameTimerOn) {
+            if (!hasAuthority || !GameManager.instance.gameTimerOn) {
                 return;
             }
             
+            if(inPrison) {
+                prisonTimer -= Time.deltaTime;
+            }
+
+            if(prisonTimer <= 0.0f) {
+                ReleasePlayer();
+            }
 
             if(playerMovementEnabled){
                 RotateView();
@@ -197,7 +201,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void FixedUpdate()
         {
             // Check if is local player.
-            if (!hasAuthority) {
+            if (!hasAuthority || !GameManager.instance.gameTimerOn) {
                 return;
             }
 
@@ -372,13 +376,31 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
             if(collider.gameObject.tag == "BadPlayer") {
-                Debug.Log("I WAS HIT!");
                 inPrison = true;
-                m_CharacterController.enabled = false;
-                transform.position = new Vector3(0.0f, 1.0f, 0.0f);
-                m_CharacterController.enabled = true;
+                prisonTimer = prisonTimerDefault;
+                Teleport(new Vector3(0.0f, 1.0f, 0.0f));
 
             }
+        }
+
+        private void ReleasePlayer() {
+            inPrison = false;
+            prisonTimer = prisonTimerDefault;
+            int posX = 0;
+            int posZ = 0;
+            while(posX == 0 && posZ == 0) {
+                posX = Random.Range(-1, 1);
+                posZ = Random.Range(-1, 1);
+                posX *= 20;
+                posZ *= 20;
+            }
+            Teleport(new Vector3(posX, 0.0f, posZ));
+        }
+
+        private void Teleport(Vector3 destination) {
+            m_CharacterController.enabled = false;
+            transform.position = destination;
+            m_CharacterController.enabled = true;
         }
     }
 }
