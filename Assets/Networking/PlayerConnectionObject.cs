@@ -24,6 +24,11 @@ public class PlayerConnectionObject : NetworkBehaviour
     [SyncVar]
     public GameObject myController;
 
+    private bool gameHasEnded = false;
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
     
     // Start is called before the first frame update
     void Start()
@@ -54,12 +59,30 @@ public class PlayerConnectionObject : NetworkBehaviour
         
     }
 
+    void Disconnect() {
+        if(isServer){
+            NetworkManager.singleton.StopHost();
+        }
+        NetworkManager.singleton.StopClient();
+    }
     // Update is called once per frame
     void Update()
     {
+        
+        if(!isLocalPlayer) {
+            return;
+        }
         if (isServer && !GameManager.instance.gameTimerOn && Input.GetKeyDown(KeyCode.O)) {
             Cmd_StartGame();
-        } 
+        }
+
+        if(!gameHasEnded && GameManager.instance.gameTime <= 0) {
+            Debug.Log("Time ran out");
+            gameHasEnded = true;
+            if(isServer) {
+                Cmd_EndGame("The Agent");
+            }
+        }
     }
     
     //public override void OnStartClient()
@@ -69,6 +92,21 @@ public class PlayerConnectionObject : NetworkBehaviour
     //}
 
     //- SERVER COMMANDS -----------------------------------
+    [Command]
+    void Cmd_EndGame(string winningTeam) 
+    {
+        Debug.Log("Changing scene");
+        DataManager.instance.winningTeam = winningTeam;          
+        Rpc_SetWinningTeam(winningTeam);      
+        NetworkManager.singleton.ServerChangeScene("Endscreen");
+    }
+
+    [ClientRpc]
+    void Rpc_SetWinningTeam(string winner)
+    {
+        DataManager.instance.winningTeam = winner;
+    }
+
     [Command]
     void Cmd_SpawnPlayerController() {
         GameObject player = Instantiate(playerControllerPrefab, GameManager.instance.GetRandomPlayerPosition(), Quaternion.identity);
@@ -112,6 +150,11 @@ public class PlayerConnectionObject : NetworkBehaviour
         Rpc_setOwner(player);
     }
 
+    // [ClientRpc]
+    // void Rpc_setWinningTeam(string team)
+    // {
+    //     DataManager.instance
+    // }
     //Client RPC
     [ClientRpc]
     void Rpc_StartGame()

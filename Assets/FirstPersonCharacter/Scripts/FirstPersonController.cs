@@ -39,6 +39,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool playerMovementEnabled;
         [SyncVar] public bool fullMapUp;
         [SyncVar] public bool miniMapUp;
+        private bool inPrison;
 
         private Camera m_Camera;
         private bool m_Jump;
@@ -54,6 +55,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Jumping;
         private AudioSource m_AudioSource;
         
+        private float prisonTimer;
+        private float prisonTimerDefault;
+
         public PlayerConnectionObject localOwner;
 
         // public void SetOwner(PlayerConnectionObject owner) {
@@ -105,6 +109,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             fullMapCamera = GameManager.instance.getFullmapCamera();
             fullMapCamera.cullingMask = mapCullingMask;
             miniMapCamera.cullingMask = mapCullingMask;
+
+            inPrison = false;
+            prisonTimer = prisonTimerDefault = 15.0f;
             
             //GameManager.instance.MovePlayerToRandomPosition(this.gameObject);
             
@@ -135,14 +142,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
             // Check if is local player.
-            if (!hasAuthority) {
-                return;
-            }
-
-            if(!GameManager.instance.gameTimerOn) {
+            if (!hasAuthority || !GameManager.instance.gameTimerOn) {
                 return;
             }
             
+            if(inPrison) {
+                prisonTimer -= Time.deltaTime;
+            }
+
+            if(prisonTimer <= 0.0f) {
+                ReleasePlayer();
+            }
 
             if(playerMovementEnabled){
                 RotateView();
@@ -191,7 +201,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private void FixedUpdate()
         {
             // Check if is local player.
-            if (!hasAuthority) {
+            if (!hasAuthority || !GameManager.instance.gameTimerOn) {
                 return;
             }
 
@@ -357,6 +367,40 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 return;
             }
             body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
+        }
+
+        private void OnTriggerEnter(Collider collider) {
+            
+            if(!hasAuthority) {
+                return;
+            }
+
+            if(collider.gameObject.tag == "BadPlayer") {
+                inPrison = true;
+                prisonTimer = prisonTimerDefault;
+                Teleport(new Vector3(0.0f, 1.0f, 0.0f));
+
+            }
+        }
+
+        private void ReleasePlayer() {
+            inPrison = false;
+            prisonTimer = prisonTimerDefault;
+            int posX = 0;
+            int posZ = 0;
+            while(posX == 0 && posZ == 0) {
+                posX = Random.Range(-1, 1);
+                posZ = Random.Range(-1, 1);
+                posX *= 20;
+                posZ *= 20;
+            }
+            Teleport(new Vector3(posX, 0.0f, posZ));
+        }
+
+        private void Teleport(Vector3 destination) {
+            m_CharacterController.enabled = false;
+            transform.position = destination;
+            m_CharacterController.enabled = true;
         }
     }
 }
