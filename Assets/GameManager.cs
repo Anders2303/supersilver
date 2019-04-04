@@ -23,10 +23,83 @@ public class GameManager : MonoBehaviour
     public bool gameTimerOn = false;
 
     public GameObject gameStatusText;
+    public GameObject objectiveCounterText;
+    public GameObject playerPrintText;
+    public GameObject canvas;
+
     
     public float gameTime;
 
+    public float ObjectiveDistanceFromPlayer;
+    public bool local_objectiveCompleted = false;
+
+    public int totalNumberOfObjectives = -1;
+    public int objectivesCompleted = 0;
+
+    private float playerNotificationLiveTime = 5;
+    private float currentPlayerNotificationLiveTime = 5;
+
+    public GameObject[] citySectors;
+
+    public void PrintToPlayer(string message) {
+        playerPrintText.GetComponent<UnityEngine.UI.Text>().text = message;
+        currentPlayerNotificationLiveTime = playerNotificationLiveTime;
+    }
+
+    public void FlipCanvasVisible() {
+        canvas.SetActive(!canvas.activeSelf);
+    }
+
+
+    public Vector3 GetPlayerSectorSpawn(int sector)
+    {
+        float spawnX = RandomSign()*spawnOffsets.x + citySectors[sector].transform.position.z;
+        float spawnY = 1;
+        float spawnZ = RandomSign()*spawnOffsets.z + citySectors[sector].transform.position.z;
+
+        return new Vector3(spawnX, spawnY, spawnZ);
+    }
+
+    public void EnableObjectiveInSector(int[] sectors)
+    {
+        int sector = sectors[Random.Range(0, sectors.Length)];
+        citySectors[sector].GetComponent<ObjectiveBuildingChooser>().EnableRandomPoint();
+    }
     
+    // This thing is an affront to god, avert your eyes
+    public void EnableObjectiveRelativeToSector(int sector)
+    {
+        switch (sector)
+        {
+            case 0:
+                EnableObjectiveInSector(new[] { 5, 7, 8 });
+                break;
+            case 1:
+                EnableObjectiveInSector(new[] { 6, 7, 8 });
+                break;
+            case 2:
+                EnableObjectiveInSector(new[] { 3, 6, 7});
+                break;
+            case 3:
+                EnableObjectiveInSector(new[] { 2, 5, 8});
+                break;
+            case 4:
+                EnableObjectiveInSector(new[] { 0, 2, 6, 8});
+                break;
+            case 5:
+                EnableObjectiveInSector(new[] { 0, 3, 6});
+                break;
+            case 6:
+                EnableObjectiveInSector(new[] { 1, 2, 5});
+                break;
+            case 7:
+                EnableObjectiveInSector(new[] { 0, 1, 2});
+                break;
+            case 8:
+                EnableObjectiveInSector(new[] { 0, 1, 3});
+                break;
+        }
+    }
 
     public Camera getFullmapCamera(){
         return fullMapCamera;
@@ -54,6 +127,8 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             //MovePlayerToRandomPosition();
         }
+
+        playerPrintText.GetComponent<UnityEngine.UI.Text>().text = "";
     }
     public void SetGameStatusText(string newText) {
         gameStatusText.GetComponent<UnityEngine.UI.Text>().text = newText;
@@ -81,24 +156,8 @@ public class GameManager : MonoBehaviour
         return new Vector3(spawnX, spawnY, spawnZ);
     }
 
-    // public void MovePlayerToRandomPosition(GameObject playerObject) {
-    //     Debug.Log("moving");
-        
-    //     int increments  = Random.Range(-3, 3); 
-    //     float spawnX = spawnIncrements.x*increments + spawnOffsets.x;
-    //     increments  = Random.Range(-3, 3); 
-    //     float spawnY = spawnIncrements.y*increments + spawnOffsets.y;
-    //     increments  = Random.Range(-3, 3); 
-    //     float spawnZ = spawnIncrements.z*increments + spawnOffsets.z;
-
-    //     Vector3 randomPosition = new Vector3(spawnX, spawnY, spawnZ);
-    //     playerObject.transform.position = randomPosition;
-    //     //Instantiate(spawnpoint, randomPosition, Quaternion.identity);
-    // }
-
     public Color GetRandomPlayerColor() {
-        return Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-        
+        return Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f); 
     }
 
     public void StartGame() {
@@ -125,5 +184,16 @@ public class GameManager : MonoBehaviour
 
             gameStatusText.GetComponent<UnityEngine.UI.Text>().text = "Time remaining: " + niceTime;
         }
+        objectiveCounterText.GetComponent<UnityEngine.UI.Text>().text = objectivesCompleted + "/" + totalNumberOfObjectives + " objectives complete";
+
+        if (currentPlayerNotificationLiveTime > 0)
+        {
+            currentPlayerNotificationLiveTime -= Time.deltaTime;
+            if(currentPlayerNotificationLiveTime <= 0) {
+                playerPrintText.GetComponent<UnityEngine.UI.Text>().text = "";
+            } 
+        }
+        
+        
     }
 }

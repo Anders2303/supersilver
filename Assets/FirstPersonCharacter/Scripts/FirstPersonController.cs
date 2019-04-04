@@ -148,6 +148,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             
             if(inPrison) {
                 prisonTimer -= Time.deltaTime;
+
+                GameManager.instance.PrintToPlayer("Captured! (" + ((int) prisonTimer) + ")");
             }
 
             if(prisonTimer <= 0.0f) {
@@ -171,6 +173,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 fullMapCamera.gameObject.SetActive(!fullMapCamera.gameObject.activeSelf);
                 playerMovementEnabled = !playerMovementEnabled;
                 fullMapUp = !fullMapUp;
+                GameManager.instance.FlipCanvasVisible();
                 Cmd_updateFullMapState(fullMapUp);
             }
 
@@ -205,6 +208,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 return;
             }
 
+            
             if(playerMovementEnabled) {
                 float speed;
                 GetInput(out speed);

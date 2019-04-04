@@ -18,6 +18,8 @@ public class PlayerConnectionObject : NetworkBehaviour
     public GameObject playerControllerPrefab;
     public GameObject playerControllerPrefab_badguy;
 
+    private int ObjectivesCompleted = 0;
+
     [SyncVar]
     public bool isBadGuy;
     
@@ -33,6 +35,7 @@ public class PlayerConnectionObject : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        GameManager.instance.totalNumberOfObjectives ++;
         if(!isLocalPlayer){
             // Kinda hacky. Sets the playerColors on all previously connect clients, (and possibly new ones?)
             if (myController != null)
@@ -52,9 +55,12 @@ public class PlayerConnectionObject : NetworkBehaviour
             isBadGuy = true;
             GameManager.instance.SetGameStatusText("Press the \"O\" key to start game");
             Cmd_SpawnPlayerController_badguy();
+            //Cmd_SpawnPlayerController();
         } else {
             GameManager.instance.SetGameStatusText("Waiting for host to start game");
-            Cmd_SpawnPlayerController();
+            int startingSector = Random.Range(0, 10);
+            Cmd_SpawnPlayerController(startingSector);
+            GameManager.instance.EnableObjectiveRelativeToSector(startingSector);
         }
         
     }
@@ -76,6 +82,11 @@ public class PlayerConnectionObject : NetworkBehaviour
             Cmd_StartGame();
         }
 
+        if(GameManager.instance.local_objectiveCompleted) {
+            Cmd_registerObjectiveComplete();
+            GameManager.instance.local_objectiveCompleted = false;
+        }
+
         if(!gameHasEnded && GameManager.instance.gameTime <= 0) {
             Debug.Log("Time ran out");
             gameHasEnded = true;
@@ -93,6 +104,20 @@ public class PlayerConnectionObject : NetworkBehaviour
 
     //- SERVER COMMANDS -----------------------------------
     [Command]
+    void Cmd_registerObjectiveComplete() {
+        if(GameManager.instance.objectivesCompleted+1 >= GameManager.instance.totalNumberOfObjectives) {
+            Cmd_EndGame("The Resistance");
+        } else {
+            Rpc_registerObjectiveComplete();
+        }
+    }
+
+    [ClientRpc]
+    void Rpc_registerObjectiveComplete() {
+        GameManager.instance.objectivesCompleted ++;
+    }
+
+    [Command]
     void Cmd_EndGame(string winningTeam) 
     {
         Debug.Log("Changing scene");
@@ -108,9 +133,9 @@ public class PlayerConnectionObject : NetworkBehaviour
     }
 
     [Command]
-    void Cmd_SpawnPlayerController() {
-        GameObject player = Instantiate(playerControllerPrefab, GameManager.instance.GetRandomPlayerPosition(), Quaternion.identity);
-
+    void Cmd_SpawnPlayerController(int startingSector) {
+        
+        GameObject player = Instantiate(playerControllerPrefab, GameManager.instance.GetPlayerSectorSpawn(startingSector), Quaternion.identity);
         //GameManager.instance.GiveRandomColor(player);
         //player.GetComponent<FirstPersonController>().SetOwner(this);
         Debug.Log("Updating server");
@@ -135,7 +160,8 @@ public class PlayerConnectionObject : NetworkBehaviour
     [Command]
     void Cmd_SpawnPlayerController_badguy() {
         GameObject player = Instantiate(playerControllerPrefab_badguy, GameManager.instance.GetRandomPlayerPosition_badguy(), Quaternion.identity);
-        player.transform.LookAt(Vector3.zero);
+        //player.transform.LookAt(Vector3.zero);
+        transform.rotation = Quaternion.Euler(45,0,0);
         //GameManager.instance.GiveRandomColor(player);
         //player.GetComponent<FirstPersonController>().SetOwner(this);
         Debug.Log("Updating server");
